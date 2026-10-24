@@ -46,9 +46,9 @@ header h1{font-size:clamp(22px,4vw,30px)}
 header p{margin:4px 0 0;color:var(--muted);font-size:14px}
 
 .toolbar{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
-.search-wrap{position:relative;flex:1;min-width:180px;z-index:1000}
+.search-wrap{position:relative;flex:1;min-width:180px;z-index:5000}
 .toolbar input[type=text]{width:100%;background:var(--surface-2);border:1px solid var(--line-soft);color:var(--ink);padding:12px;border-radius:4px;font-size:16px;font-family:var(--font-body)}
-.suggestions{position:absolute;left:0;right:0;top:100%;margin-top:4px;background:var(--surface);border:1px solid var(--line-soft);border-radius:4px;max-height:260px;overflow-y:auto;z-index:2000;display:none;box-shadow:0 8px 20px rgba(0,0,0,.35)}
+.suggestions{position:absolute;left:0;right:0;top:100%;margin-top:4px;background:var(--surface);border:1px solid var(--line-soft);border-radius:4px;max-height:260px;overflow-y:auto;z-index:5000;display:none;box-shadow:0 8px 20px rgba(0,0,0,.35)}
 .suggestions.show{display:block}
 .suggestions .item{padding:11px 12px;font-size:14px;cursor:pointer;border-bottom:1px solid var(--line-soft)}
 .suggestions .item:last-child{border-bottom:none}
@@ -67,9 +67,10 @@ header p{margin:4px 0 0;color:var(--muted);font-size:14px}
 @media (max-width:560px){
   .wrap{padding:14px 12px 48px}
   #map{height:320px}
-  .toolbar{gap:6px}
-  .btn{flex:1;min-width:0;padding:11px 10px;font-size:12.5px}
-  .btn span.btn-label{display:inline}
+  .toolbar{gap:10px}
+  .search-wrap{flex-basis:100%}
+  .toolbar input[type=text]{padding:14px;font-size:16px}
+  .btn{flex:1;min-width:0;padding:13px 10px;font-size:13px}
 }
 
 .legend{display:flex;flex-wrap:wrap;gap:12px 16px;margin:0 0 18px;font-size:12.5px;color:var(--muted)}
@@ -95,8 +96,8 @@ header p{margin:4px 0 0;color:var(--muted);font-size:14px}
 .inline-other input{flex:1}
 .btn-row{display:flex;gap:8px;margin-top:4px}
 
-.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:var(--surface);border:1px solid var(--line);color:var(--ink);padding:9px 16px;border-radius:4px;font-size:13px;box-shadow:0 6px 18px rgba(0,0,0,.3);z-index:999;opacity:0;transition:opacity .25s,transform .25s;max-width:90vw;text-align:center}
-.toast.show{opacity:1;transform:translateX(-50%) translateY(-4px)}
+.toast{position:fixed;left:50%;top:14px;transform:translateX(-50%) translateY(-16px);background:var(--surface);border:1px solid var(--line);color:var(--ink);padding:11px 18px;border-radius:4px;font-size:13.5px;line-height:1.4;box-shadow:0 8px 24px rgba(0,0,0,.4);z-index:99999;opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;max-width:min(92vw,440px);text-align:center}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
 .setup-warning{background:#5a3a12;color:#ffe3b3;border:1px solid var(--accent);border-radius:4px;padding:10px 14px;font-size:13px;margin-bottom:16px}
 
@@ -488,7 +489,7 @@ document.getElementById("point-form").addEventListener("submit", function(ev){
   submitBtn.disabled = true;
 
   if (SCRIPT_URL.indexOf("COLE_AQUI") > -1){
-    showToast("Configuração pendente: o link da planilha (Apps Script) ainda não foi definido.");
+    showToast("Configuração pendente: a conexão com o banco de dados ainda não foi definida.");
     submitBtn.disabled = false;
     return;
   }
@@ -499,7 +500,7 @@ document.getElementById("point-form").addEventListener("submit", function(ev){
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body: new URLSearchParams(payload).toString()
   }).then(function(){
-    showToast("Ponto registrado na planilha. Obrigado!");
+    showToast("Ponto registrado no banco de dados. Obrigado!");
     document.getElementById("point-form").reset();
     document.getElementById("form-panel").classList.remove("show");
     document.getElementById("address-panel").classList.remove("show");
