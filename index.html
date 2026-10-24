@@ -112,19 +112,6 @@ a{color:var(--line)}
     <form id="point-form">
 
       <div class="form-field">
-        <label for="f-bairro">Bairro / região</label>
-        <select id="f-bairro">
-          <option value="Justinópolis">Justinópolis</option>
-          <option value="Centro">Centro (Sede)</option>
-          <option value="Veneza">Veneza</option>
-          <option value="Outro">Outro</option>
-        </select>
-        <div class="inline-other" id="f-bairro-other-wrap" hidden>
-          <input type="text" id="f-bairro-other" placeholder="Nome do bairro">
-        </div>
-      </div>
-
-      <div class="form-field">
         <label for="f-endereco">Endereço aproximado</label>
         <input type="text" id="f-endereco" placeholder="Rua e número próximo">
       </div>
@@ -268,9 +255,6 @@ document.querySelectorAll('#f-consequencias input').forEach(function(r){
     document.getElementById("f-consequencia-other-wrap").hidden = !outroChecked;
   });
 });
-document.getElementById("f-bairro").addEventListener("change", function(e){
-  document.getElementById("f-bairro-other-wrap").hidden = (e.target.value !== "Outro");
-});
 
 /* ---------- mapa real: ruas + satélite ---------- */
 var map = L.map("map", { center: RN, zoom: 13 });
@@ -318,11 +302,8 @@ function locate(lat, lng){
       el.textContent = display;
       current.endereco = display;
       var g = guessBairro(addr);
-      current.bairro = g.bairro;
+      current.bairro = g.bairro === "Outro" ? (g.raw || "Outro") : g.bairro;
       document.getElementById("f-endereco").value = display;
-      document.getElementById("f-bairro").value = g.bairro;
-      document.getElementById("f-bairro-other-wrap").hidden = (g.bairro !== "Outro");
-      if (g.bairro === "Outro") document.getElementById("f-bairro-other").value = g.raw || "";
     })
     .catch(function(){
       el.classList.remove("loading");
@@ -437,8 +418,7 @@ document.getElementById("point-form").addEventListener("submit", function(ev){
     showToast("Preencha o tipo de problema, frequência, duração e se já foi acionado.");
     return;
   }
-  var bairroSel = document.getElementById("f-bairro").value;
-  var bairroFinal = bairroSel === "Outro" ? (document.getElementById("f-bairro-other").value.trim() || "Outro") : bairroSel;
+  var bairroFinal = current.bairro || "";
   var consequencias = Array.from(document.querySelectorAll('#f-consequencias input:checked')).map(function(i){ return i.value; });
 
   var payload = {
