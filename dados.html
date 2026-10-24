@@ -273,7 +273,7 @@ function render(rows){
   });
 
   // tabela
-  var cols = ["Data/Hora","Bairro","Endereço","Pesquisador","Tipo de problema","Frequência","Duração sem solução","Consequências","Já acionado"];
+  var cols = ["Data/Hora","Bairro","Endereço","Pesquisador","Tipo de problema","Frequência","Duração sem solução","Consequências","Já acionado","Foto"];
   var head = document.getElementById("table-head");
   head.innerHTML = "";
   cols.forEach(function(c){
@@ -290,6 +290,10 @@ function render(rows){
         var span = document.createElement("span");
         span.className = "pill"; span.textContent = r[c] || "—";
         td.appendChild(span);
+      } else if (c === "Foto" && r[c] && r[c].indexOf("http") === 0){
+        var a = document.createElement("a");
+        a.href = r[c]; a.target = "_blank"; a.rel = "noopener"; a.textContent = "📷 Ver foto";
+        td.appendChild(a);
       } else {
         td.textContent = r[c] || "—";
       }

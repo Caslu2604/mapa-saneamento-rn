@@ -99,6 +99,11 @@ header p{margin:4px 0 0;color:var(--muted);font-size:14px}
 .inline-other input{flex:1}
 .btn-row{display:flex;gap:8px;margin-top:4px}
 
+.photo-preview{position:relative;display:inline-block;max-width:220px;margin-top:10px}
+.photo-preview img{display:block;width:100%;border-radius:4px;border:1px solid var(--line-soft)}
+.btn-remove-photo{position:absolute;top:6px;right:6px;width:26px;height:26px;border-radius:50%;border:none;background:rgba(0,0,0,.65);color:#fff;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;transition:transform .12s ease}
+.btn-remove-photo:active{transform:scale(.88)}
+
 .toast{position:fixed;left:50%;top:14px;transform:translateX(-50%) translateY(-16px);background:var(--surface);border:1px solid var(--line);color:var(--ink);padding:11px 18px;border-radius:4px;font-size:13.5px;line-height:1.4;box-shadow:0 8px 24px rgba(0,0,0,.4);z-index:99999;opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;max-width:min(92vw,440px);text-align:center}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
@@ -193,6 +198,16 @@ a{color:var(--line)}
           <legend>Copasa / Prefeitura já foram acionadas?</legend>
           <div class="radio-list" id="f-acionado"></div>
         </fieldset>
+      </div>
+
+      <div class="form-field">
+        <label>Foto do local (opcional)</label>
+        <input type="file" id="f-foto" accept="image/*" capture="environment" hidden>
+        <button type="button" class="btn" id="btn-foto">📷 Tirar/escolher foto</button>
+        <div class="photo-preview" id="photo-preview" hidden>
+          <img id="photo-preview-img" alt="Prévia da foto selecionada">
+          <button type="button" class="btn-remove-photo" id="btn-remove-foto" aria-label="Remover foto">✕</button>
+        </div>
       </div>
 
       <div class="btn-row">
@@ -451,6 +466,53 @@ document.getElementById("f-cancel").addEventListener("click", function(){
   document.getElementById("form-panel").classList.remove("show");
 });
 
+/* ---------- foto do local (opcional): captura/seleciona, comprime no navegador antes de enviar ---------- */
+var fotoDataUrl = null; // data URL (base64) já comprimida, pronta pra enviar
+
+document.getElementById("btn-foto").addEventListener("click", function(){
+  document.getElementById("f-foto").click();
+});
+
+document.getElementById("f-foto").addEventListener("change", function(){
+  var file = this.files && this.files[0];
+  if (!file) return;
+  if (file.type.indexOf("image/") !== 0){ showToast("Selecione um arquivo de imagem."); return; }
+  var reader = new FileReader();
+  reader.onload = function(ev){
+    var img = new Image();
+    img.onload = function(){
+      var MAX = 1280;
+      var w = img.width, h = img.height;
+      if (w > MAX || h > MAX){
+        if (w > h){ h = Math.round(h * (MAX / w)); w = MAX; }
+        else { w = Math.round(w * (MAX / h)); h = MAX; }
+      }
+      var canvas = document.createElement("canvas");
+      canvas.width = w; canvas.height = h;
+      canvas.getContext("2d").drawImage(img, 0, 0, w, h);
+      fotoDataUrl = canvas.toDataURL("image/jpeg", 0.72);
+      document.getElementById("photo-preview-img").src = fotoDataUrl;
+      document.getElementById("photo-preview").hidden = false;
+    };
+    img.onerror = function(){ showToast("Não foi possível ler essa imagem. Tente outra."); };
+    img.src = ev.target.result;
+  };
+  reader.onerror = function(){ showToast("Não foi possível ler essa imagem. Tente outra."); };
+  reader.readAsDataURL(file);
+});
+
+document.getElementById("btn-remove-foto").addEventListener("click", function(){
+  fotoDataUrl = null;
+  document.getElementById("f-foto").value = "";
+  document.getElementById("photo-preview").hidden = true;
+});
+
+function limparFoto(){
+  fotoDataUrl = null;
+  document.getElementById("f-foto").value = "";
+  document.getElementById("photo-preview").hidden = true;
+}
+
 /* ---------- toast ---------- */
 var toastTimer=null;
 function showToast(msg){
@@ -494,13 +556,20 @@ document.getElementById("point-form").addEventListener("submit", function(ev){
     lat: current.lat,
     lng: current.lng
   };
+  if (fotoDataUrl){
+    payload.foto = fotoDataUrl.split(",")[1];
+    payload.fotoTipo = "image/jpeg";
+  }
 
   var submitBtn = document.getElementById("f-submit");
+  var submitOriginal = submitBtn.textContent;
   submitBtn.disabled = true;
+  submitBtn.textContent = fotoDataUrl ? "Enviando foto…" : "Enviando…";
 
   if (SCRIPT_URL.indexOf("COLE_AQUI") > -1){
     showToast("Configuração pendente: a conexão com o banco de dados ainda não foi definida.");
     submitBtn.disabled = false;
+    submitBtn.textContent = submitOriginal;
     return;
   }
 
@@ -512,14 +581,17 @@ document.getElementById("point-form").addEventListener("submit", function(ev){
   }).then(function(){
     showToast("Ponto registrado no banco de dados. Obrigado!");
     document.getElementById("point-form").reset();
+    limparFoto();
     document.getElementById("form-panel").classList.remove("show");
     document.getElementById("address-panel").classList.remove("show");
     if (marker){ map.removeLayer(marker); marker = null; }
     current = { lat:null, lng:null, endereco:"", bairro:"" };
     submitBtn.disabled = false;
+    submitBtn.textContent = submitOriginal;
   }).catch(function(){
     showToast("Não foi possível salvar agora. Verifique sua internet e tente de novo.");
     submitBtn.disabled = false;
+    submitBtn.textContent = submitOriginal;
   });
 });
 
