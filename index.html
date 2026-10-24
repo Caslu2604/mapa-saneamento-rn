@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mapa do Saneamento — Ribeirão das Neves</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+:root{
+  --bg:#0b2a4a; --surface:#123c63; --surface-2:#194a78;
+  --line:#4fb3d9; --line-soft:#2d5d82; --ink:#eaf3fb; --muted:#9dc0da; --accent:#ffb454; --accent-ink:#1a1206;
+  --font-display:'Oswald',"Arial Narrow",sans-serif; --font-body:'IBM Plex Sans',"Segoe UI",sans-serif; --font-mono:'IBM Plex Mono',"Courier New",monospace;
+}
+@media (prefers-color-scheme: light){
+  :root{
+    --bg:#eef3f8; --surface:#ffffff; --surface-2:#e3edf6;
+    --line:#2c7aa8; --line-soft:#b9d2e3; --ink:#0d2a44; --muted:#4c6b85; --accent:#c97a1b; --accent-ink:#fff8ef;
+  }
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body);line-height:1.45}
+h1,h2,h3{font-family:var(--font-display);text-transform:uppercase;letter-spacing:.04em;margin:0}
+.wrap{max-width:1100px;margin:0 auto;padding:18px 16px 50px}
+header{border-bottom:2px solid var(--line-soft);padding-bottom:12px;margin-bottom:16px}
+header h1{font-size:clamp(22px,4vw,30px)}
+header p{margin:4px 0 0;color:var(--muted);font-size:14px}
+
+.toolbar{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.toolbar input[type=text]{flex:1;min-width:180px;background:var(--surface-2);border:1px solid var(--line-soft);color:var(--ink);padding:10px 12px;border-radius:4px;font-size:14px;font-family:var(--font-body)}
+.btn{display:inline-flex;align-items:center;gap:6px;border-radius:4px;border:1px solid var(--line);padding:10px 16px;font-size:13.5px;font-weight:500;cursor:pointer;font-family:var(--font-body);background:var(--surface-2);color:var(--ink)}
+.btn-primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn:disabled{opacity:.55;cursor:default}
+
+#map{height:460px;border:1px solid var(--line-soft);border-radius:4px;margin-bottom:12px}
+
+.coord-panel{background:var(--surface);border:1px solid var(--line-soft);border-radius:4px;padding:14px;margin-bottom:16px;display:none}
+.coord-panel.show{display:block}
+.coord-panel .label{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.coord-panel .value{font-family:var(--font-mono);font-size:20px;color:var(--accent);margin:4px 0 10px;font-variant-numeric:tabular-nums}
+.coord-panel .hint{font-size:13px;color:var(--muted)}
+
+.legend{display:flex;flex-wrap:wrap;gap:14px;margin:10px 0 20px;font-size:12.5px;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.dot{width:10px;height:10px;border-radius:50%;display:inline-block}
+
+.form-card{background:var(--surface);border:1px solid var(--line-soft);border-radius:4px;padding:4px;margin-bottom:24px}
+.form-card .form-head{padding:12px 14px 0}
+.form-card .form-head h2{font-size:14px;color:var(--muted)}
+.form-card iframe{width:100%;border:0;min-height:1200px;border-radius:4px}
+.setup-warning{background:#5a3a12;color:#ffe3b3;border:1px solid var(--accent);border-radius:4px;padding:10px 14px;font-size:13px;margin:10px 14px}
+
+footer{color:var(--muted);font-size:11.5px;border-top:1px solid var(--line-soft);padding-top:10px}
+a{color:var(--line)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <h1>Mapa do Saneamento</h1>
+    <p>Mapeamento participativo &middot; Ribeirão das Neves, MG &mdash; mapa real com satélite e localização por GPS</p>
+  </header>
+
+  <div class="toolbar">
+    <input type="text" id="search-input" placeholder="Digite o endereço ou ponto de referência" autocomplete="off">
+    <button class="btn" id="btn-search">Buscar endereço</button>
+    <button class="btn btn-primary" id="btn-geo">📍 Usar minha localização</button>
+  </div>
+
+  <div id="map"></div>
+
+  <div class="coord-panel" id="coord-panel">
+    <div class="label">Local selecionado</div>
+    <div class="value" id="coord-value">—</div>
+    <div class="hint">Copie essas coordenadas e cole no campo de localização do formulário abaixo para registrar o problema neste ponto.
+      <button class="btn" id="btn-copy" style="margin-left:8px;padding:4px 10px;font-size:12px">Copiar</button>
+    </div>
+  </div>
+
+  <div class="legend" id="legend"></div>
+
+  <div class="form-card">
+    <div class="form-head">
+      <h2>Registrar ponto crítico</h2>
+    </div>
+    <iframe id="form-frame" src="https://docs.google.com/forms/d/e/1FAIpQLSclyL-9VxjpD0IMLBYuWHxqgTXilbR6Vys2ngcRqJ7G7-5eTQ/viewform?embedded=true" title="Formulário de registro"></iframe>
+  </div>
+
+  <footer>Ferramenta do projeto de extensão &ldquo;Mapa de Impacto do Saneamento em Ribeirão das Neves&rdquo;. Mapas: &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">colaboradores do OpenStreetMap</a> &middot; imagens de satélite: Esri.</footer>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script>
+(function(){
+"use strict";
+
+/* ---------- ponto de partida: Ribeirão das Neves, MG ---------- */
+var RN = [-19.7677, -44.0875];
+
+var CATS = [
+  { id:"esgoto", label:"Esgoto a céu aberto", color:"#e2725b" },
+  { id:"agua", label:"Falta crônica de água", color:"#f2c14e" },
+  { id:"vazamento", label:"Vazamento de água limpa", color:"#5bc0de" },
+  { id:"retorno", label:"Retorno de esgoto", color:"#b58aec" },
+  { id:"descarte", label:"Descarte irregular", color:"#9bc258" },
+  { id:"outro", label:"Outro problema", color:"#9aa7b5" }
+];
+(function(){
+  var box = document.getElementById("legend");
+  CATS.forEach(function(c){
+    var s = document.createElement("span");
+    s.innerHTML = '<span class="dot" style="background:'+c.color+'"></span>'+c.label;
+    box.appendChild(s);
+  });
+})();
+
+/* ---------- mapa real: ruas + satélite ---------- */
+var map = L.map("map", { center: RN, zoom: 13 });
+
+var streets = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+  maxZoom: 19,
+  attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+}).addTo(map);
+
+var satellite = L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", {
+  maxZoom: 19,
+  attribution: "Tiles &copy; Esri &mdash; Source: Esri, Maxar, Earthstar Geographics"
+});
+
+L.control.layers({ "Mapa": streets, "Satélite": satellite }, {}, { position: "topright" }).addTo(map);
+
+var marker = null;
+function setMarker(lat, lng){
+  if (marker) map.removeLayer(marker);
+  marker = L.marker([lat, lng], { draggable: true }).addTo(map);
+  marker.on("dragend", function(){
+    var p = marker.getLatLng();
+    showCoords(p.lat, p.lng);
+  });
+  map.setView([lat, lng], Math.max(map.getZoom(), 16));
+  showCoords(lat, lng);
+}
+function showCoords(lat, lng){
+  document.getElementById("coord-panel").classList.add("show");
+  document.getElementById("coord-value").textContent = lat.toFixed(6) + ", " + lng.toFixed(6);
+}
+
+map.on("click", function(e){ setMarker(e.latlng.lat, e.latlng.lng); });
+
+document.getElementById("btn-copy").addEventListener("click", function(){
+  var txt = document.getElementById("coord-value").textContent;
+  if (txt === "—") return;
+  navigator.clipboard && navigator.clipboard.writeText(txt).catch(function(){});
+  var btn = document.getElementById("btn-copy");
+  var old = btn.textContent; btn.textContent = "Copiado!";
+  setTimeout(function(){ btn.textContent = old; }, 1500);
+});
+
+/* ---------- geolocalização real (funciona aqui, fora do Claude) ---------- */
+document.getElementById("btn-geo").addEventListener("click", function(){
+  var btn = this;
+  if (!navigator.geolocation){
+    alert("Seu navegador não suporta localização.");
+    return;
+  }
+  btn.disabled = true; var original = btn.textContent; btn.textContent = "Localizando…";
+  navigator.geolocation.getCurrentPosition(function(pos){
+    btn.disabled = false; btn.textContent = original;
+    setMarker(pos.coords.latitude, pos.coords.longitude);
+  }, function(err){
+    btn.disabled = false; btn.textContent = original;
+    alert("Não foi possível obter sua localização (" + err.message + "). Você pode buscar o endereço ou tocar no mapa.");
+  }, { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 });
+});
+
+/* ---------- busca de endereço (Nominatim/OpenStreetMap, gratuito) ---------- */
+function searchAddress(){
+  var q = document.getElementById("search-input").value.trim();
+  if (!q) return;
+  var btn = document.getElementById("btn-search");
+  btn.disabled = true; var original = btn.textContent; btn.textContent = "Buscando…";
+  var query = q.toLowerCase().indexOf("ribeirão das neves") > -1 ? q : (q + ", Ribeirão das Neves, MG, Brasil");
+  fetch("https://nominatim.openstreetmap.org/search?format=json&limit=1&q=" + encodeURIComponent(query))
+    .then(function(r){ return r.json(); })
+    .then(function(results){
+      btn.disabled = false; btn.textContent = original;
+      if (!results || !results.length){
+        alert("Endereço não encontrado. Tente com mais detalhes (rua, bairro) ou toque direto no mapa.");
+        return;
+      }
+      setMarker(parseFloat(results[0].lat), parseFloat(results[0].lon));
+    })
+    .catch(function(){
+      btn.disabled = false; btn.textContent = original;
+      alert("Não foi possível buscar agora. Tente de novo em alguns segundos.");
+    });
+}
+document.getElementById("btn-search").addEventListener("click", searchAddress);
+document.getElementById("search-input").addEventListener("keydown", function(e){ if (e.key === "Enter"){ e.preventDefault(); searchAddress(); } });
+
+})();
+</script>
+</body>
+</html>
