@@ -30,7 +30,13 @@ header h1{font-size:clamp(22px,4vw,30px)}
 header p{margin:4px 0 0;color:var(--muted);font-size:14px}
 
 .toolbar{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
-.toolbar input[type=text]{flex:1;min-width:180px;background:var(--surface-2);border:1px solid var(--line-soft);color:var(--ink);padding:10px 12px;border-radius:4px;font-size:14px;font-family:var(--font-body)}
+.search-wrap{position:relative;flex:1;min-width:180px}
+.toolbar input[type=text]{width:100%;background:var(--surface-2);border:1px solid var(--line-soft);color:var(--ink);padding:10px 12px;border-radius:4px;font-size:14px;font-family:var(--font-body)}
+.suggestions{position:absolute;left:0;right:0;top:100%;margin-top:4px;background:var(--surface);border:1px solid var(--line-soft);border-radius:4px;max-height:260px;overflow-y:auto;z-index:50;display:none;box-shadow:0 8px 20px rgba(0,0,0,.35)}
+.suggestions.show{display:block}
+.suggestions .item{padding:9px 12px;font-size:13.5px;cursor:pointer;border-bottom:1px solid var(--line-soft)}
+.suggestions .item:last-child{border-bottom:none}
+.suggestions .item:hover{background:var(--surface-2)}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border-radius:4px;border:1px solid var(--line);padding:10px 16px;font-size:13.5px;font-weight:500;cursor:pointer;font-family:var(--font-body);background:var(--surface-2);color:var(--ink)}
 .btn-primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
 .btn-ghost{background:transparent;color:var(--muted)}
@@ -82,7 +88,10 @@ a{color:var(--line)}
   <div class="setup-warning" id="setup-warning">⚠️ Configuração pendente: troque <code>SCRIPT_URL</code> no final do arquivo pelo link do seu Google Apps Script (veja as instruções que o Claude te passou) e apague este aviso.</div>
 
   <div class="toolbar">
-    <input type="text" id="search-input" placeholder="Digite o endereço ou ponto de referência" autocomplete="off">
+    <div class="search-wrap">
+      <input type="text" id="search-input" placeholder="Digite o endereço ou ponto de referência" autocomplete="off">
+      <div class="suggestions" id="search-suggestions"></div>
+    </div>
     <button class="btn" id="btn-search">Buscar</button>
     <button class="btn btn-primary" id="btn-geo">📍 Minha localização</button>
   </div>
@@ -210,7 +219,7 @@ var DURACOES = [
 ];
 var CONSEQ = [
   { id:"mau_cheiro", label:"Mau cheiro constante" },
-  { id:"insetos", label:"Insetos, ratos ou escorpiões" },
+  { id:"insetos", label:"Animais peçonhentos (insetos, ratos, escorpiões)" },
   { id:"doencas", label:"Casos recentes de doenças" },
   { id:"locomocao", label:"Dificuldade de locomoção" },
   { id:"prejuizo", label:"Prejuízo financeiro" },
@@ -352,8 +361,51 @@ function searchAddress(){
     })
     .catch(function(){ btn.disabled = false; btn.textContent = original; alert("Não foi possível buscar agora. Tente de novo."); });
 }
-document.getElementById("btn-search").addEventListener("click", searchAddress);
-document.getElementById("search-input").addEventListener("keydown", function(e){ if (e.key === "Enter"){ e.preventDefault(); searchAddress(); } });
+document.getElementById("btn-search").addEventListener("click", function(){ hideSuggestions(); searchAddress(); });
+document.getElementById("search-input").addEventListener("keydown", function(e){ if (e.key === "Enter"){ e.preventDefault(); hideSuggestions(); searchAddress(); } });
+
+/* ---------- sugestões de endereço ao digitar (como em apps de transporte) ---------- */
+var suggestDebounce = null, suggestAbort = null;
+document.getElementById("search-input").addEventListener("input", function(){
+  var q = this.value.trim();
+  clearTimeout(suggestDebounce);
+  if (q.length < 3){ hideSuggestions(); return; }
+  suggestDebounce = setTimeout(function(){ fetchSuggestions(q); }, 350);
+});
+function fetchSuggestions(q){
+  if (suggestAbort) suggestAbort.abort();
+  suggestAbort = new AbortController();
+  var query = q.toLowerCase().indexOf("ribeirão das neves") > -1 ? q : (q + ", Ribeirão das Neves, MG, Brasil");
+  fetch("https://nominatim.openstreetmap.org/search?format=json&limit=5&addressdetails=1&q=" + encodeURIComponent(query), { signal: suggestAbort.signal })
+    .then(function(r){ return r.json(); })
+    .then(function(results){ renderSuggestions(results || []); })
+    .catch(function(e){ if (e.name !== "AbortError") hideSuggestions(); });
+}
+function renderSuggestions(results){
+  var box = document.getElementById("search-suggestions");
+  box.innerHTML = "";
+  if (!results.length){ hideSuggestions(); return; }
+  results.forEach(function(r){
+    var item = document.createElement("div");
+    item.className = "item";
+    item.textContent = r.display_name;
+    item.addEventListener("click", function(){
+      document.getElementById("search-input").value = r.display_name;
+      hideSuggestions();
+      setMarker(parseFloat(r.lat), parseFloat(r.lon));
+    });
+    box.appendChild(item);
+  });
+  box.classList.add("show");
+}
+function hideSuggestions(){
+  var box = document.getElementById("search-suggestions");
+  box.classList.remove("show");
+  box.innerHTML = "";
+}
+document.addEventListener("click", function(e){
+  if (!e.target.closest(".search-wrap")) hideSuggestions();
+});
 
 /* ---------- abrir/fechar formulário ---------- */
 document.getElementById("btn-open-form").addEventListener("click", function(){
