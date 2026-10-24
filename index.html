@@ -4,6 +4,22 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Mapa do Saneamento — Ribeirão das Neves</title>
+<meta name="description" content="Mapa colaborativo para registrar e visualizar pontos críticos de saneamento básico (esgoto a céu aberto, falta de água, vazamentos) em Ribeirão das Neves, MG.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💧</text></svg>">
+
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://caslu2604.github.io/mapa-saneamento-rn/">
+<meta property="og:title" content="Mapa do Saneamento — Ribeirão das Neves">
+<meta property="og:description" content="Ajude a mapear esgoto a céu aberto, falta de água e outros problemas de saneamento no seu bairro. Leva menos de 2 minutos.">
+<meta property="og:image" content="https://caslu2604.github.io/mapa-saneamento-rn/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="pt_BR">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Mapa do Saneamento — Ribeirão das Neves">
+<meta name="twitter:description" content="Ajude a mapear esgoto a céu aberto, falta de água e outros problemas de saneamento no seu bairro.">
+<meta name="twitter:image" content="https://caslu2604.github.io/mapa-saneamento-rn/og-image.png">
+
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
@@ -30,20 +46,31 @@ header h1{font-size:clamp(22px,4vw,30px)}
 header p{margin:4px 0 0;color:var(--muted);font-size:14px}
 
 .toolbar{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
-.search-wrap{position:relative;flex:1;min-width:180px}
-.toolbar input[type=text]{width:100%;background:var(--surface-2);border:1px solid var(--line-soft);color:var(--ink);padding:10px 12px;border-radius:4px;font-size:14px;font-family:var(--font-body)}
-.suggestions{position:absolute;left:0;right:0;top:100%;margin-top:4px;background:var(--surface);border:1px solid var(--line-soft);border-radius:4px;max-height:260px;overflow-y:auto;z-index:50;display:none;box-shadow:0 8px 20px rgba(0,0,0,.35)}
+.search-wrap{position:relative;flex:1;min-width:180px;z-index:1000}
+.toolbar input[type=text]{width:100%;background:var(--surface-2);border:1px solid var(--line-soft);color:var(--ink);padding:12px;border-radius:4px;font-size:16px;font-family:var(--font-body)}
+.suggestions{position:absolute;left:0;right:0;top:100%;margin-top:4px;background:var(--surface);border:1px solid var(--line-soft);border-radius:4px;max-height:260px;overflow-y:auto;z-index:2000;display:none;box-shadow:0 8px 20px rgba(0,0,0,.35)}
 .suggestions.show{display:block}
-.suggestions .item{padding:9px 12px;font-size:13.5px;cursor:pointer;border-bottom:1px solid var(--line-soft)}
+.suggestions .item{padding:11px 12px;font-size:14px;cursor:pointer;border-bottom:1px solid var(--line-soft)}
 .suggestions .item:last-child{border-bottom:none}
-.suggestions .item:hover{background:var(--surface-2)}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border-radius:4px;border:1px solid var(--line);padding:10px 16px;font-size:13.5px;font-weight:500;cursor:pointer;font-family:var(--font-body);background:var(--surface-2);color:var(--ink)}
-.btn-primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.suggestions .item:hover,.suggestions .item:active{background:var(--surface-2)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border-radius:4px;border:1px solid var(--line);padding:11px 16px;min-height:44px;font-size:13.5px;font-weight:500;cursor:pointer;font-family:var(--font-body);background:var(--surface-2);color:var(--ink);transition:transform .12s ease,filter .12s ease,box-shadow .12s ease,background-color .12s ease;-webkit-tap-highlight-color:transparent;user-select:none}
+.btn:hover{filter:brightness(1.1)}
+.btn:active{transform:scale(.95);filter:brightness(.95)}
+.btn-primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);box-shadow:0 2px 10px rgba(255,180,84,.3)}
+.btn-primary:active{box-shadow:0 1px 4px rgba(255,180,84,.2)}
 .btn-ghost{background:transparent;color:var(--muted)}
-.btn:disabled{opacity:.55;cursor:default}
+.btn-ghost:hover{filter:none;background:var(--surface-2)}
+.btn:disabled{opacity:.55;cursor:default;transform:none!important;filter:none!important}
 .btn-block{width:100%}
 
 #map{height:420px;border:1px solid var(--line-soft);border-radius:4px;margin-bottom:12px}
+@media (max-width:560px){
+  .wrap{padding:14px 12px 48px}
+  #map{height:320px}
+  .toolbar{gap:6px}
+  .btn{flex:1;min-width:0;padding:11px 10px;font-size:12.5px}
+  .btn span.btn-label{display:inline}
+}
 
 .legend{display:flex;flex-wrap:wrap;gap:12px 16px;margin:0 0 18px;font-size:12.5px;color:var(--muted)}
 .legend span{display:inline-flex;align-items:center;gap:6px}
@@ -59,7 +86,7 @@ header p{margin:4px 0 0;color:var(--muted);font-size:14px}
 
 .form-field{margin-bottom:12px}
 .form-field label,.form-field legend{display:block;font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:5px;padding:0}
-.form-field input[type=text],.form-field select{width:100%;background:var(--surface-2);border:1px solid var(--line-soft);color:var(--ink);padding:8px 9px;border-radius:3px;font-size:13.5px;font-family:var(--font-body)}
+.form-field input[type=text],.form-field select{width:100%;background:var(--surface-2);border:1px solid var(--line-soft);color:var(--ink);padding:10px 9px;border-radius:3px;font-size:16px;font-family:var(--font-body)}
 .form-field fieldset{border:none;margin:0;padding:0}
 .radio-list,.check-list{display:flex;flex-direction:column;gap:6px}
 .radio-list label,.check-list label{display:flex;align-items:flex-start;gap:8px;font-size:13px;color:var(--ink);text-transform:none;letter-spacing:0;cursor:pointer}
@@ -260,11 +287,19 @@ document.querySelectorAll('#f-consequencias input').forEach(function(r){
 var map = L.map("map", { center: RN, zoom: 13 });
 var streets = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
   maxZoom: 19, attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-}).addTo(map);
+});
 var satellite = L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", {
   maxZoom: 19, attribution: "Tiles &copy; Esri &mdash; Source: Esri, Maxar, Earthstar Geographics"
-});
-L.control.layers({ "Mapa": streets, "Satélite": satellite }, {}, { position: "topright" }).addTo(map);
+}).addTo(map);
+L.control.layers({ "Satélite": satellite, "Mapa": streets }, {}, { position: "topright" }).addTo(map);
+
+/* ---------- ao abrir o site, já centraliza no local do usuário (silencioso, sem marcar pino) ---------- */
+if (navigator.geolocation){
+  navigator.geolocation.getCurrentPosition(function(pos){
+    map.setView([pos.coords.latitude, pos.coords.longitude], 15);
+  }, function(){ /* permissão negada ou indisponível: mantém a visão padrão de Ribeirão das Neves */ },
+  { enableHighAccuracy: false, timeout: 8000, maximumAge: 300000 });
+}
 
 var marker = null, current = { lat:null, lng:null, endereco:"", bairro:"" };
 
@@ -315,15 +350,28 @@ function locate(lat, lng){
 /* ---------- geolocalização real ---------- */
 document.getElementById("btn-geo").addEventListener("click", function(){
   var btn = this;
-  if (!navigator.geolocation){ alert("Seu navegador não suporta localização."); return; }
-  btn.disabled = true; var original = btn.textContent; btn.textContent = "Localizando…";
+  if (!navigator.geolocation){ showToast("Seu navegador não suporta localização."); return; }
+  if (!window.isSecureContext){ showToast("A localização só funciona em conexão segura (https)."); return; }
+  btn.disabled = true; var original = btn.innerHTML; btn.innerHTML = "Localizando…";
+  var done = false;
+  var fallbackTimer = setTimeout(function(){
+    if (done) return; done = true;
+    btn.disabled = false; btn.innerHTML = original;
+    showToast("A busca por localização demorou demais. Tente de novo ao ar livre ou use a busca por endereço.");
+  }, 16000);
   navigator.geolocation.getCurrentPosition(function(pos){
-    btn.disabled = false; btn.textContent = original;
+    if (done) return; done = true; clearTimeout(fallbackTimer);
+    btn.disabled = false; btn.innerHTML = original;
     setMarker(pos.coords.latitude, pos.coords.longitude);
   }, function(err){
-    btn.disabled = false; btn.textContent = original;
-    alert("Não foi possível obter sua localização (" + err.message + "). Busque o endereço ou toque no mapa.");
-  }, { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 });
+    if (done) return; done = true; clearTimeout(fallbackTimer);
+    btn.disabled = false; btn.innerHTML = original;
+    var msg = "Não foi possível obter sua localização. Busque o endereço ou toque no mapa.";
+    if (err && err.code === 1) msg = "Você negou o acesso à localização. No iPhone: Ajustes → Privacidade e Segurança → Serviços de Localização → Safari (ou o app usado) → Ao Usar o App. Depois volte e tente de novo.";
+    else if (err && err.code === 2) msg = "Não conseguimos determinar sua localização agora. Tente de novo ao ar livre ou use a busca por endereço.";
+    else if (err && err.code === 3) msg = "A busca por localização demorou demais. Tente de novo ou use a busca por endereço.";
+    showToast(msg);
+  }, { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 });
 });
 
 /* ---------- busca de endereço ---------- */
@@ -337,10 +385,10 @@ function searchAddress(){
     .then(function(r){ return r.json(); })
     .then(function(results){
       btn.disabled = false; btn.textContent = original;
-      if (!results || !results.length){ alert("Endereço não encontrado. Tente com mais detalhes ou toque no mapa."); return; }
+      if (!results || !results.length){ showToast("Endereço não encontrado. Tente com mais detalhes ou toque no mapa."); return; }
       setMarker(parseFloat(results[0].lat), parseFloat(results[0].lon));
     })
-    .catch(function(){ btn.disabled = false; btn.textContent = original; alert("Não foi possível buscar agora. Tente de novo."); });
+    .catch(function(){ btn.disabled = false; btn.textContent = original; showToast("Não foi possível buscar agora. Tente de novo."); });
 }
 document.getElementById("btn-search").addEventListener("click", function(){ hideSuggestions(); searchAddress(); });
 document.getElementById("search-input").addEventListener("keydown", function(e){ if (e.key === "Enter"){ e.preventDefault(); hideSuggestions(); searchAddress(); } });
