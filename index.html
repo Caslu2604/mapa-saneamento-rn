@@ -41,9 +41,12 @@
 body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body);line-height:1.45}
 h1,h2,h3{font-family:var(--font-display);text-transform:uppercase;letter-spacing:.04em;margin:0}
 .wrap{max-width:920px;margin:0 auto;padding:18px 16px 60px}
-header{border-bottom:2px solid var(--line-soft);padding-bottom:12px;margin-bottom:16px}
+header{border-bottom:2px solid var(--line-soft);padding-bottom:12px;margin-bottom:16px;display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:10px}
 header h1{font-size:clamp(22px,4vw,30px)}
 header p{margin:4px 0 0;color:var(--muted);font-size:14px}
+.nav-link{display:inline-flex;align-items:center;gap:6px;color:var(--line);text-decoration:none;font-size:13.5px;font-weight:500;border:1px solid var(--line-soft);padding:9px 14px;border-radius:4px;transition:background-color .12s ease,transform .12s ease}
+.nav-link:hover{background:var(--surface-2)}
+.nav-link:active{transform:scale(.96)}
 
 .toolbar{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
 .search-wrap{position:relative;flex:1;min-width:180px;z-index:5000}
@@ -109,8 +112,11 @@ a{color:var(--line)}
 <div class="wrap">
 
   <header>
-    <h1>Mapa do Saneamento</h1>
-    <p>Mapeamento participativo &middot; Ribeirão das Neves, MG</p>
+    <div>
+      <h1>Mapa do Saneamento</h1>
+      <p>Mapeamento participativo &middot; Ribeirão das Neves, MG</p>
+    </div>
+    <a class="nav-link" href="dados.html">📊 Ver dados</a>
   </header>
 
   <div class="setup-warning" id="setup-warning">⚠️ Configuração pendente: troque <code>SCRIPT_URL</code> no final do arquivo pelo link do seu Google Apps Script (veja as instruções que o Claude te passou) e apague este aviso.</div>
