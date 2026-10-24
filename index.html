@@ -11,45 +11,61 @@
 :root{
   --bg:#0b2a4a; --surface:#123c63; --surface-2:#194a78;
   --line:#4fb3d9; --line-soft:#2d5d82; --ink:#eaf3fb; --muted:#9dc0da; --accent:#ffb454; --accent-ink:#1a1206;
+  --good:#7fd1a0; --bad:#e2725b;
   --font-display:'Oswald',"Arial Narrow",sans-serif; --font-body:'IBM Plex Sans',"Segoe UI",sans-serif; --font-mono:'IBM Plex Mono',"Courier New",monospace;
 }
 @media (prefers-color-scheme: light){
   :root{
     --bg:#eef3f8; --surface:#ffffff; --surface-2:#e3edf6;
     --line:#2c7aa8; --line-soft:#b9d2e3; --ink:#0d2a44; --muted:#4c6b85; --accent:#c97a1b; --accent-ink:#fff8ef;
+    --good:#2e8b57; --bad:#c1452e;
   }
 }
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body);line-height:1.45}
 h1,h2,h3{font-family:var(--font-display);text-transform:uppercase;letter-spacing:.04em;margin:0}
-.wrap{max-width:1100px;margin:0 auto;padding:18px 16px 50px}
+.wrap{max-width:920px;margin:0 auto;padding:18px 16px 60px}
 header{border-bottom:2px solid var(--line-soft);padding-bottom:12px;margin-bottom:16px}
 header h1{font-size:clamp(22px,4vw,30px)}
 header p{margin:4px 0 0;color:var(--muted);font-size:14px}
 
 .toolbar{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
 .toolbar input[type=text]{flex:1;min-width:180px;background:var(--surface-2);border:1px solid var(--line-soft);color:var(--ink);padding:10px 12px;border-radius:4px;font-size:14px;font-family:var(--font-body)}
-.btn{display:inline-flex;align-items:center;gap:6px;border-radius:4px;border:1px solid var(--line);padding:10px 16px;font-size:13.5px;font-weight:500;cursor:pointer;font-family:var(--font-body);background:var(--surface-2);color:var(--ink)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border-radius:4px;border:1px solid var(--line);padding:10px 16px;font-size:13.5px;font-weight:500;cursor:pointer;font-family:var(--font-body);background:var(--surface-2);color:var(--ink)}
 .btn-primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn-ghost{background:transparent;color:var(--muted)}
 .btn:disabled{opacity:.55;cursor:default}
+.btn-block{width:100%}
 
-#map{height:460px;border:1px solid var(--line-soft);border-radius:4px;margin-bottom:12px}
+#map{height:420px;border:1px solid var(--line-soft);border-radius:4px;margin-bottom:12px}
 
-.coord-panel{background:var(--surface);border:1px solid var(--line-soft);border-radius:4px;padding:14px;margin-bottom:16px;display:none}
-.coord-panel.show{display:block}
-.coord-panel .label{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
-.coord-panel .value{font-family:var(--font-mono);font-size:20px;color:var(--accent);margin:4px 0 10px;font-variant-numeric:tabular-nums}
-.coord-panel .hint{font-size:13px;color:var(--muted)}
-
-.legend{display:flex;flex-wrap:wrap;gap:14px;margin:10px 0 20px;font-size:12.5px;color:var(--muted)}
+.legend{display:flex;flex-wrap:wrap;gap:12px 16px;margin:0 0 18px;font-size:12.5px;color:var(--muted)}
 .legend span{display:inline-flex;align-items:center;gap:6px}
-.dot{width:10px;height:10px;border-radius:50%;display:inline-block}
+.dot{width:10px;height:10px;border-radius:50%;display:inline-block;flex:none}
 
-.form-card{background:var(--surface);border:1px solid var(--line-soft);border-radius:4px;padding:4px;margin-bottom:24px}
-.form-card .form-head{padding:12px 14px 0}
-.form-card .form-head h2{font-size:14px;color:var(--muted)}
-.form-card iframe{width:100%;border:0;min-height:1200px;border-radius:4px}
-.setup-warning{background:#5a3a12;color:#ffe3b3;border:1px solid var(--accent);border-radius:4px;padding:10px 14px;font-size:13px;margin:10px 14px}
+.panel{background:var(--surface);border:1px solid var(--line-soft);border-radius:4px;padding:14px;margin-bottom:16px;display:none}
+.panel.show{display:block}
+.panel h2{font-size:13px;color:var(--muted);letter-spacing:.06em;margin-bottom:10px}
+
+.addr-value{font-size:17px;color:var(--ink);margin-bottom:4px}
+.addr-sub{font-size:12px;color:var(--muted);margin-bottom:12px}
+.addr-value.loading{color:var(--muted);font-style:italic}
+
+.form-field{margin-bottom:12px}
+.form-field label,.form-field legend{display:block;font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:5px;padding:0}
+.form-field input[type=text],.form-field select{width:100%;background:var(--surface-2);border:1px solid var(--line-soft);color:var(--ink);padding:8px 9px;border-radius:3px;font-size:13.5px;font-family:var(--font-body)}
+.form-field fieldset{border:none;margin:0;padding:0}
+.radio-list,.check-list{display:flex;flex-direction:column;gap:6px}
+.radio-list label,.check-list label{display:flex;align-items:flex-start;gap:8px;font-size:13px;color:var(--ink);text-transform:none;letter-spacing:0;cursor:pointer}
+.radio-list input,.check-list input{margin-top:3px;accent-color:var(--accent);flex:none}
+.inline-other{display:flex;gap:8px;align-items:center;margin-top:6px}
+.inline-other input{flex:1}
+.btn-row{display:flex;gap:8px;margin-top:4px}
+
+.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:var(--surface);border:1px solid var(--line);color:var(--ink);padding:9px 16px;border-radius:4px;font-size:13px;box-shadow:0 6px 18px rgba(0,0,0,.3);z-index:999;opacity:0;transition:opacity .25s,transform .25s;max-width:90vw;text-align:center}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(-4px)}
+
+.setup-warning{background:#5a3a12;color:#ffe3b3;border:1px solid var(--accent);border-radius:4px;padding:10px 14px;font-size:13px;margin-bottom:16px}
 
 footer{color:var(--muted);font-size:11.5px;border-top:1px solid var(--line-soft);padding-top:10px}
 a{color:var(--line)}
@@ -60,43 +76,116 @@ a{color:var(--line)}
 
   <header>
     <h1>Mapa do Saneamento</h1>
-    <p>Mapeamento participativo &middot; Ribeirão das Neves, MG &mdash; mapa real com satélite e localização por GPS</p>
+    <p>Mapeamento participativo &middot; Ribeirão das Neves, MG</p>
   </header>
+
+  <div class="setup-warning" id="setup-warning">⚠️ Configuração pendente: troque <code>SCRIPT_URL</code> no final do arquivo pelo link do seu Google Apps Script (veja as instruções que o Claude te passou) e apague este aviso.</div>
 
   <div class="toolbar">
     <input type="text" id="search-input" placeholder="Digite o endereço ou ponto de referência" autocomplete="off">
-    <button class="btn" id="btn-search">Buscar endereço</button>
-    <button class="btn btn-primary" id="btn-geo">📍 Usar minha localização</button>
+    <button class="btn" id="btn-search">Buscar</button>
+    <button class="btn btn-primary" id="btn-geo">📍 Minha localização</button>
   </div>
 
   <div id="map"></div>
 
-  <div class="coord-panel" id="coord-panel">
-    <div class="label">Local selecionado</div>
-    <div class="value" id="coord-value">—</div>
-    <div class="hint">Copie essas coordenadas e cole no campo de localização do formulário abaixo para registrar o problema neste ponto.
-      <button class="btn" id="btn-copy" style="margin-left:8px;padding:4px 10px;font-size:12px">Copiar</button>
-    </div>
-  </div>
-
   <div class="legend" id="legend"></div>
 
-  <div class="form-card">
-    <div class="form-head">
-      <h2>Registrar ponto crítico</h2>
-    </div>
-    <iframe id="form-frame" src="https://docs.google.com/forms/d/e/1FAIpQLSclyL-9VxjpD0IMLBYuWHxqgTXilbR6Vys2ngcRqJ7G7-5eTQ/viewform?embedded=true" title="Formulário de registro"></iframe>
+  <div class="panel" id="address-panel">
+    <h2>Local selecionado</h2>
+    <div class="addr-value" id="addr-value">—</div>
+    <div class="addr-sub">Não é exatamente o lugar certo? Você pode ajustar o endereço no formulário abaixo.</div>
+    <button class="btn btn-primary btn-block" id="btn-open-form">Registrar problema neste local</button>
+  </div>
+
+  <div class="panel" id="form-panel">
+    <h2>Registrar ponto crítico</h2>
+    <form id="point-form">
+
+      <div class="form-field">
+        <label for="f-bairro">Bairro / região</label>
+        <select id="f-bairro">
+          <option value="Justinópolis">Justinópolis</option>
+          <option value="Centro">Centro (Sede)</option>
+          <option value="Veneza">Veneza</option>
+          <option value="Outro">Outro</option>
+        </select>
+        <div class="inline-other" id="f-bairro-other-wrap" hidden>
+          <input type="text" id="f-bairro-other" placeholder="Nome do bairro">
+        </div>
+      </div>
+
+      <div class="form-field">
+        <label for="f-endereco">Endereço aproximado</label>
+        <input type="text" id="f-endereco" placeholder="Rua e número próximo">
+      </div>
+
+      <div class="form-field">
+        <label for="f-pesquisador">Nome do pesquisador(a) / morador(a) &mdash; opcional</label>
+        <input type="text" id="f-pesquisador" placeholder="Quem está registrando">
+      </div>
+
+      <div class="form-field">
+        <fieldset>
+          <legend>Principal problema identificado</legend>
+          <div class="radio-list" id="f-tipo"></div>
+          <div class="inline-other" id="f-tipo-other-wrap" hidden>
+            <input type="text" id="f-tipo-other" placeholder="Descreva o problema">
+          </div>
+        </fieldset>
+      </div>
+
+      <div class="form-field">
+        <fieldset>
+          <legend>Frequência do problema</legend>
+          <div class="radio-list" id="f-frequencia"></div>
+        </fieldset>
+      </div>
+
+      <div class="form-field">
+        <fieldset>
+          <legend>Há quanto tempo, sem solução</legend>
+          <div class="radio-list" id="f-duracao"></div>
+        </fieldset>
+      </div>
+
+      <div class="form-field">
+        <fieldset>
+          <legend>Consequências visíveis (marque quantas houver)</legend>
+          <div class="check-list" id="f-consequencias"></div>
+          <div class="inline-other" id="f-consequencia-other-wrap" hidden>
+            <input type="text" id="f-consequencia-other" placeholder="Outra consequência">
+          </div>
+        </fieldset>
+      </div>
+
+      <div class="form-field">
+        <fieldset>
+          <legend>Copasa / Prefeitura já foram acionadas?</legend>
+          <div class="radio-list" id="f-acionado"></div>
+        </fieldset>
+      </div>
+
+      <div class="btn-row">
+        <button type="submit" class="btn btn-primary" id="f-submit">Registrar ponto</button>
+        <button type="button" class="btn btn-ghost" id="f-cancel">Cancelar</button>
+      </div>
+    </form>
   </div>
 
   <footer>Ferramenta do projeto de extensão &ldquo;Mapa de Impacto do Saneamento em Ribeirão das Neves&rdquo;. Mapas: &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">colaboradores do OpenStreetMap</a> &middot; imagens de satélite: Esri.</footer>
 </div>
+
+<div class="toast" id="toast"></div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 <script>
 (function(){
 "use strict";
 
-/* ---------- ponto de partida: Ribeirão das Neves, MG ---------- */
+/* ===== CONFIGURAÇÃO: troque pelo link do seu Google Apps Script implantado como Web App ===== */
+var SCRIPT_URL = "COLE_AQUI_O_LINK_DO_APPS_SCRIPT";
+
 var RN = [-19.7677, -44.0875];
 
 var CATS = [
@@ -107,6 +196,32 @@ var CATS = [
   { id:"descarte", label:"Descarte irregular", color:"#9bc258" },
   { id:"outro", label:"Outro problema", color:"#9aa7b5" }
 ];
+var FREQS = [
+  { id:"diario", label:"Todos os dias (crônico)" },
+  { id:"semanal", label:"Várias vezes na semana" },
+  { id:"sazonal", label:"Em épocas específicas (chuva/calor)" },
+  { id:"recente", label:"Começou recentemente" }
+];
+var DURACOES = [
+  { id:"m1", label:"Menos de 1 mês" },
+  { id:"m6", label:"De 1 a 6 meses" },
+  { id:"a1", label:"De 6 meses a 1 ano" },
+  { id:"a1mais", label:"Há mais de 1 ano" }
+];
+var CONSEQ = [
+  { id:"mau_cheiro", label:"Mau cheiro constante" },
+  { id:"insetos", label:"Insetos, ratos ou escorpiões" },
+  { id:"doencas", label:"Casos recentes de doenças" },
+  { id:"locomocao", label:"Dificuldade de locomoção" },
+  { id:"prejuizo", label:"Prejuízo financeiro" },
+  { id:"outro", label:"Outra consequência" }
+];
+var ACIONADO = [
+  { id:"sem_resolver", label:"Sim, mas não resolveram" },
+  { id:"paliativo", label:"Sim, fizeram paliativo e voltou" },
+  { id:"nao_sabe", label:"Não sabemos / nunca foi aberto protocolo" }
+];
+
 (function(){
   var box = document.getElementById("legend");
   CATS.forEach(function(c){
@@ -115,67 +230,113 @@ var CATS = [
     box.appendChild(s);
   });
 })();
+function buildRadioGroup(containerId, name, items){
+  var box = document.getElementById(containerId);
+  items.forEach(function(it){
+    var label = document.createElement("label");
+    label.innerHTML = '<input type="radio" name="'+name+'" value="'+it.id+'"> '+it.label;
+    box.appendChild(label);
+  });
+}
+buildRadioGroup("f-tipo","tipo",CATS);
+buildRadioGroup("f-frequencia","frequencia",FREQS);
+buildRadioGroup("f-duracao","duracao",DURACOES);
+buildRadioGroup("f-acionado","acionado",ACIONADO);
+(function(){
+  var box = document.getElementById("f-consequencias");
+  CONSEQ.forEach(function(it){
+    var label = document.createElement("label");
+    label.innerHTML = '<input type="checkbox" value="'+it.id+'"> '+it.label;
+    box.appendChild(label);
+  });
+})();
+document.querySelectorAll('#f-tipo input').forEach(function(r){
+  r.addEventListener("change", function(){ document.getElementById("f-tipo-other-wrap").hidden = (r.value!=="outro" || !r.checked); });
+});
+document.querySelectorAll('#f-consequencias input').forEach(function(r){
+  r.addEventListener("change", function(){
+    var outroChecked = Array.from(document.querySelectorAll('#f-consequencias input')).some(function(i){ return i.value==="outro" && i.checked; });
+    document.getElementById("f-consequencia-other-wrap").hidden = !outroChecked;
+  });
+});
+document.getElementById("f-bairro").addEventListener("change", function(e){
+  document.getElementById("f-bairro-other-wrap").hidden = (e.target.value !== "Outro");
+});
 
 /* ---------- mapa real: ruas + satélite ---------- */
 var map = L.map("map", { center: RN, zoom: 13 });
-
 var streets = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-  maxZoom: 19,
-  attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+  maxZoom: 19, attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 }).addTo(map);
-
 var satellite = L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", {
-  maxZoom: 19,
-  attribution: "Tiles &copy; Esri &mdash; Source: Esri, Maxar, Earthstar Geographics"
+  maxZoom: 19, attribution: "Tiles &copy; Esri &mdash; Source: Esri, Maxar, Earthstar Geographics"
 });
-
 L.control.layers({ "Mapa": streets, "Satélite": satellite }, {}, { position: "topright" }).addTo(map);
 
-var marker = null;
+var marker = null, current = { lat:null, lng:null, endereco:"", bairro:"" };
+
 function setMarker(lat, lng){
   if (marker) map.removeLayer(marker);
   marker = L.marker([lat, lng], { draggable: true }).addTo(map);
-  marker.on("dragend", function(){
-    var p = marker.getLatLng();
-    showCoords(p.lat, p.lng);
-  });
+  marker.on("dragend", function(){ var p = marker.getLatLng(); locate(p.lat, p.lng); });
   map.setView([lat, lng], Math.max(map.getZoom(), 16));
-  showCoords(lat, lng);
+  locate(lat, lng);
 }
-function showCoords(lat, lng){
-  document.getElementById("coord-panel").classList.add("show");
-  document.getElementById("coord-value").textContent = lat.toFixed(6) + ", " + lng.toFixed(6);
-}
-
 map.on("click", function(e){ setMarker(e.latlng.lat, e.latlng.lng); });
 
-document.getElementById("btn-copy").addEventListener("click", function(){
-  var txt = document.getElementById("coord-value").textContent;
-  if (txt === "—") return;
-  navigator.clipboard && navigator.clipboard.writeText(txt).catch(function(){});
-  var btn = document.getElementById("btn-copy");
-  var old = btn.textContent; btn.textContent = "Copiado!";
-  setTimeout(function(){ btn.textContent = old; }, 1500);
-});
+/* ---------- geocodificação reversa: pino -> endereço legível (sem mostrar coordenada) ---------- */
+var BAIRRO_HINTS = { "justinópolis":"Justinópolis", "justinopolis":"Justinópolis", "centro":"Centro", "veneza":"Veneza" };
+function guessBairro(addr){
+  var fields = [addr.suburb, addr.neighbourhood, addr.city_district, addr.quarter].filter(Boolean);
+  for (var i=0;i<fields.length;i++){
+    var key = fields[i].toLowerCase();
+    for (var hint in BAIRRO_HINTS){ if (key.indexOf(hint) > -1) return { bairro:BAIRRO_HINTS[hint], raw:fields[i] }; }
+  }
+  return { bairro:"Outro", raw: fields[0] || "" };
+}
+function locate(lat, lng){
+  current.lat = lat; current.lng = lng;
+  document.getElementById("address-panel").classList.add("show");
+  var el = document.getElementById("addr-value");
+  el.textContent = "Localizando endereço…";
+  el.classList.add("loading");
+  fetch("https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=" + lat + "&lon=" + lng + "&zoom=18&addressdetails=1")
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      el.classList.remove("loading");
+      var addr = (data && data.address) || {};
+      var display = data && data.display_name ? data.display_name : (lat.toFixed(5) + ", " + lng.toFixed(5));
+      el.textContent = display;
+      current.endereco = display;
+      var g = guessBairro(addr);
+      current.bairro = g.bairro;
+      document.getElementById("f-endereco").value = display;
+      document.getElementById("f-bairro").value = g.bairro;
+      document.getElementById("f-bairro-other-wrap").hidden = (g.bairro !== "Outro");
+      if (g.bairro === "Outro") document.getElementById("f-bairro-other").value = g.raw || "";
+    })
+    .catch(function(){
+      el.classList.remove("loading");
+      el.textContent = "Não foi possível identificar o endereço automaticamente — preencha manualmente abaixo.";
+      current.endereco = "";
+    });
+}
 
-/* ---------- geolocalização real (funciona aqui, fora do Claude) ---------- */
+/* ---------- geolocalização real ---------- */
 document.getElementById("btn-geo").addEventListener("click", function(){
   var btn = this;
-  if (!navigator.geolocation){
-    alert("Seu navegador não suporta localização.");
-    return;
-  }
+  if (!navigator.geolocation){ alert("Seu navegador não suporta localização."); return; }
   btn.disabled = true; var original = btn.textContent; btn.textContent = "Localizando…";
   navigator.geolocation.getCurrentPosition(function(pos){
     btn.disabled = false; btn.textContent = original;
     setMarker(pos.coords.latitude, pos.coords.longitude);
   }, function(err){
     btn.disabled = false; btn.textContent = original;
-    alert("Não foi possível obter sua localização (" + err.message + "). Você pode buscar o endereço ou tocar no mapa.");
+    alert("Não foi possível obter sua localização (" + err.message + "). Busque o endereço ou toque no mapa.");
   }, { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 });
 });
 
-/* ---------- busca de endereço (Nominatim/OpenStreetMap, gratuito) ---------- */
+/* ---------- busca de endereço ---------- */
 function searchAddress(){
   var q = document.getElementById("search-input").value.trim();
   if (!q) return;
@@ -186,19 +347,94 @@ function searchAddress(){
     .then(function(r){ return r.json(); })
     .then(function(results){
       btn.disabled = false; btn.textContent = original;
-      if (!results || !results.length){
-        alert("Endereço não encontrado. Tente com mais detalhes (rua, bairro) ou toque direto no mapa.");
-        return;
-      }
+      if (!results || !results.length){ alert("Endereço não encontrado. Tente com mais detalhes ou toque no mapa."); return; }
       setMarker(parseFloat(results[0].lat), parseFloat(results[0].lon));
     })
-    .catch(function(){
-      btn.disabled = false; btn.textContent = original;
-      alert("Não foi possível buscar agora. Tente de novo em alguns segundos.");
-    });
+    .catch(function(){ btn.disabled = false; btn.textContent = original; alert("Não foi possível buscar agora. Tente de novo."); });
 }
 document.getElementById("btn-search").addEventListener("click", searchAddress);
 document.getElementById("search-input").addEventListener("keydown", function(e){ if (e.key === "Enter"){ e.preventDefault(); searchAddress(); } });
+
+/* ---------- abrir/fechar formulário ---------- */
+document.getElementById("btn-open-form").addEventListener("click", function(){
+  document.getElementById("form-panel").classList.add("show");
+  document.getElementById("form-panel").scrollIntoView({ behavior:"smooth", block:"start" });
+});
+document.getElementById("f-cancel").addEventListener("click", function(){
+  document.getElementById("form-panel").classList.remove("show");
+});
+
+/* ---------- toast ---------- */
+var toastTimer=null;
+function showToast(msg){
+  var t = document.getElementById("toast");
+  t.textContent = msg; t.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function(){ t.classList.remove("show"); }, 3500);
+}
+
+/* ---------- enviar: grava direto na planilha via Google Apps Script ---------- */
+document.getElementById("point-form").addEventListener("submit", function(ev){
+  ev.preventDefault();
+  if (current.lat == null){ showToast("Selecione um local no mapa primeiro."); return; }
+  var tipoEl = document.querySelector('#f-tipo input:checked');
+  var freqEl = document.querySelector('#f-frequencia input:checked');
+  var durEl = document.querySelector('#f-duracao input:checked');
+  var acEl = document.querySelector('#f-acionado input:checked');
+  if (!tipoEl || !freqEl || !durEl || !acEl){
+    showToast("Preencha o tipo de problema, frequência, duração e se já foi acionado.");
+    return;
+  }
+  var bairroSel = document.getElementById("f-bairro").value;
+  var bairroFinal = bairroSel === "Outro" ? (document.getElementById("f-bairro-other").value.trim() || "Outro") : bairroSel;
+  var consequencias = Array.from(document.querySelectorAll('#f-consequencias input:checked')).map(function(i){ return i.value; });
+
+  var payload = {
+    bairro: bairroFinal,
+    endereco: document.getElementById("f-endereco").value.trim(),
+    pesquisador: document.getElementById("f-pesquisador").value.trim(),
+    tipo: tipoEl.value,
+    tipoOutro: tipoEl.value==="outro" ? document.getElementById("f-tipo-other").value.trim() : "",
+    frequencia: freqEl.value,
+    duracao: durEl.value,
+    consequencias: consequencias.join("; "),
+    consequenciaOutro: consequencias.indexOf("outro")>-1 ? document.getElementById("f-consequencia-other").value.trim() : "",
+    acionado: acEl.value,
+    lat: current.lat,
+    lng: current.lng
+  };
+
+  var submitBtn = document.getElementById("f-submit");
+  submitBtn.disabled = true;
+
+  if (SCRIPT_URL.indexOf("COLE_AQUI") > -1){
+    showToast("Configuração pendente: o link da planilha (Apps Script) ainda não foi definido.");
+    submitBtn.disabled = false;
+    return;
+  }
+
+  fetch(SCRIPT_URL, {
+    method: "POST",
+    mode: "no-cors",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: new URLSearchParams(payload).toString()
+  }).then(function(){
+    showToast("Ponto registrado na planilha. Obrigado!");
+    document.getElementById("point-form").reset();
+    document.getElementById("form-panel").classList.remove("show");
+    document.getElementById("address-panel").classList.remove("show");
+    if (marker){ map.removeLayer(marker); marker = null; }
+    current = { lat:null, lng:null, endereco:"", bairro:"" };
+    submitBtn.disabled = false;
+  }).catch(function(){
+    showToast("Não foi possível salvar agora. Verifique sua internet e tente de novo.");
+    submitBtn.disabled = false;
+  });
+});
+
+if (SCRIPT_URL.indexOf("COLE_AQUI") === -1){
+  document.getElementById("setup-warning").style.display = "none";
+}
 
 })();
 </script>
