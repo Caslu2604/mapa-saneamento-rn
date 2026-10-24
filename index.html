@@ -468,19 +468,24 @@ document.getElementById("point-form").addEventListener("submit", function(ev){
     return;
   }
   var bairroFinal = current.bairro || "";
-  var consequencias = Array.from(document.querySelectorAll('#f-consequencias input:checked')).map(function(i){ return i.value; });
+  var consequenciaIds = Array.from(document.querySelectorAll('#f-consequencias input:checked')).map(function(i){ return i.value; });
+
+  function labelFor(list, id){
+    var found = list.filter(function(x){ return x.id === id; })[0];
+    return found ? found.label : id;
+  }
 
   var payload = {
     bairro: bairroFinal,
     endereco: document.getElementById("f-endereco").value.trim(),
     pesquisador: document.getElementById("f-pesquisador").value.trim(),
-    tipo: tipoEl.value,
+    tipo: labelFor(CATS, tipoEl.value),
     tipoOutro: tipoEl.value==="outro" ? document.getElementById("f-tipo-other").value.trim() : "",
-    frequencia: freqEl.value,
-    duracao: durEl.value,
-    consequencias: consequencias.join("; "),
-    consequenciaOutro: consequencias.indexOf("outro")>-1 ? document.getElementById("f-consequencia-other").value.trim() : "",
-    acionado: acEl.value,
+    frequencia: labelFor(FREQS, freqEl.value),
+    duracao: labelFor(DURACOES, durEl.value),
+    consequencias: consequenciaIds.map(function(id){ return labelFor(CONSEQ, id); }).join("; "),
+    consequenciaOutro: consequenciaIds.indexOf("outro")>-1 ? document.getElementById("f-consequencia-other").value.trim() : "",
+    acionado: labelFor(ACIONADO, acEl.value),
     lat: current.lat,
     lng: current.lng
   };
